@@ -1,0 +1,3 @@
+[submodule ".ml-python-configs"]
+	path = .ml-python-configs
+	url = https://github.com/MichiganLabs/python-config.git
