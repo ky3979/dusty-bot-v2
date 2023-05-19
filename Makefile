@@ -57,21 +57,16 @@ pylint-package: install
 # pylint-tests: install
 # 	poetry run pylint --rcfile=.ml-python-configs/.tests-pylintrc -dC0111 tests
 
-# .PHONY: pylint
-# pylint: pylint-package pylint-tests
+.PHONY: pylint
+pylint: pylint-package
 
 .PHONY: format
 format: install
 	poetry run isort --settings-path .ml-python-configs/.isort.cfg --project $(PACKAGE) --virtual-env .venv/ ${ISORT_ARGS} $(PACKAGE)
 	@ echo
 
-requirements-liccheck.txt: install
-	poetry export -f requirements.txt --output requirements-liccheck.txt --without-hashes
-licenses: requirements-liccheck.txt
-	poetry run liccheck -s .ml-python-configs/liccheck-server.cfg -r requirements-liccheck.txt -l paranoid -R license-report.txt
-
 .PHONY: lint
-lint: isort-check-only licenses
+lint: pylint
 
 # DATABASE ####################################################################
 args = $(foreach a,$($(subst -,_,$1)_args),$(if $(value $a),--$a "$($a)"))

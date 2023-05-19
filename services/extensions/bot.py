@@ -12,6 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 from services.exceptions.bot import MissingBotTokenException
 from services.exceptions.cog import LoadCogException
 
+
 class CustomFormatter(Formatter):
     def format(self, record: LogRecord) -> str:
         s = super().format(record)

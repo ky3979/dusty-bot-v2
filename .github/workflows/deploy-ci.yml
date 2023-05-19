@@ -1,0 +1,24 @@
+name: Deploy to Heroku
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set release version
+      id: vars
+      run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+    - name: Deploy to staging
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+      run: |
+        apk add --no-cache git curl
+        echo "Deploying ${{ github.workspace }} $RELEASE_VERSION to Heroku"
+        SUCCESS=0; git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/dusty-bot-v2-staging.git || SUCCESS=$?
+        SUCCESS=0; git remote set-url heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/dusty-bot-v2-staging.git || SUCCESS=$?
+        git push -f heroku HEAD:refs/heads/master

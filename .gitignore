@@ -1,7 +1,9 @@
-.install
 .venv/
 .vscode/*.log
 logs/*.log
+
+# Project config files
+.install
 
 # Cache
 .pytest_cache
