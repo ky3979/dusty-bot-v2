@@ -9,20 +9,31 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10.5"
-Flask = "^2.3.2"
-gunicorn = "^20.1.0"
-flasgger = "^0.9.5"
-marshmallow = "^3.19.0"
-marshmallow-dataclass = "^8.5.14"
+gunicorn = "^20.1"
+flasgger = "=0.9.4dev0"
 requests = "webargs"
-webargs = "^8.2.0"
-Flask-Cors = "^3.0.10"
 "discord.py" = "^2.2.3"
+webargs = "^8.1.0"
+psycopg2-binary = "^2.9.3"
+asyncpg = "^0.27.0"
+aiohttp = "^3.8.1"
+Flask = "^2.3.2"
+Flask-SQLAlchemy = "^3.0.3"
+Flask-Migrate = "^4.0.4"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.3.1"
-pylint = "^2.17.4"
+pytest = "^7.0.1"
+pytest-random-order = "^1.0.4"
+pylint = "~2.13.9"
+pytest-cov = "^3.0"
+responses = "^0.10.8"
+honcho = "^1.1.0"
+factory-boy = "^3.2.1"
+"testing.postgresql" = "^1.3.0"
 python-dotenv = "^1.0.0"
+
+[tool.poetry.extras]
+local_testing = ["testing.postgresql"]
 
 [build-system]
 requires = ["poetry>=1.0.3"]
