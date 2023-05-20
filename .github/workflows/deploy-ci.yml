@@ -22,5 +22,4 @@ jobs:
         echo "Deploying ${{ github.workspace }} $RELEASE_VERSION to Heroku"
         SUCCESS=0; git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/dusty-bot-v2-staging.git || SUCCESS=$?
         SUCCESS=0; git remote set-url heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/dusty-bot-v2-staging.git || SUCCESS=$?
-        git fetch --all --unshallow
         git push -f heroku HEAD:refs/heads/master
