@@ -1,0 +1,18 @@
+# fly.toml app configuration file generated for dusty-bot-v2 on 2023-05-20T23:24:26-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "dusty-bot-v2"
+primary_region = "ord"
+
+kill_signal = "SIGINT"
+kill_timeout = 5
+
+
+[deploy]
+    release_command = "./release.sh"
+
+[processes]
+    server = "./server.sh"
+    bot = "python main.py"

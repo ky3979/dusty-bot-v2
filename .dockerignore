@@ -1,0 +1,20 @@
+# flyctl launch added from .gitignore
+**/.venv
+**/.vscode/*.log
+**/logs/*.log
+
+# Project config files
+**/.install
+
+# Cache
+**/.pytest_cache
+**/__pycache__
+**/.mypy_cache
+
+# Files with secret information
+**/.env*
+
+# flyctl launch added from .venv/.gitignore
+# created by virtualenv automatically
+.venv/**/*
+fly.toml
