@@ -17,12 +17,6 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Store artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        path: |
-          ~/license-report.txt
-
     - name: Setup python ${{ env.PYTHON_VERSION }}
       id: setup-python
       uses: actions/setup-python@v4

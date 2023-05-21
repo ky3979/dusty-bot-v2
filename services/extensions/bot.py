@@ -96,7 +96,7 @@ class DustyBot(Bot):
             await self.change_presence(
                 activity=Activity(
                     type=ActivityType.watching,
-                    name='You sleep.'
+                    name='You Sleep.'
                 )
             )
             _log.info(
