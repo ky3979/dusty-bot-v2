@@ -24,7 +24,7 @@ class WeeklyPostCog(commands.Cog):
         self.syncing_time = False
         self.send_posts.start()
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(minutes=30)
     async def send_posts(self):
         """Send posts from database on their scheduled day and time"""
         _log.info(f'[send_post] Executing send_posts task.')
@@ -33,7 +33,6 @@ class WeeklyPostCog(commands.Cog):
         posts_for_today = WeeklyPost.get_by_day_of_week(now.weekday())
         _log.info(f'[send_post] Got {len(posts_for_today)} posts for {now}.')
         
-        _log.info(f'[send_post] Sending posts with hour {now.hour} and minute {now.minute}')
         for post in posts_for_today:
             _log.info(f'[send_post] Got post {post.id} with hour {post.hour} and minute {post.minute}.')
             if post.hour == now.hour and post.minute == now.minute:
