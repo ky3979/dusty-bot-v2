@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Called by "git commit" with no arguments.  The hook should
 # exit with non-zero status after issuing an appropriate message if
@@ -7,7 +7,7 @@
 protected_branches='develop-main' # concatonated names of branches to protect using - since that is the separator for words in branch names
 current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
 
-if [[ "-$protected_branches-" =~ .*\-$current_branch\-.* ]];
+if [ "$protected_branches" = *"$current_branch"* ];
 then
     read -p "You're about to commit to ${current_branch}, are you sure? [y|n] " -n 1 -r < /dev/tty
     echo
