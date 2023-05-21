@@ -23,7 +23,6 @@ class Config:
     SQLALCHEMY_DATABASE_URI: str = 'sqlite:///'
     SQLALCHEMY_LOG_LEVEL: int = logging.INFO
 
-    DISCORD_LOG_FILE_PATH: str = 'logs/discord.log'
     DISCORD_BOT_TOKEN: str = os.getenv('DISCORD_BOT_TOKEN', '')
     DISCORD_GUILD_ID: str = os.getenv('DISCORD_GUILD_ID', '')
     DISCORD_OWNER_ID: str = os.getenv('DISCORD_OWNER_ID', '')

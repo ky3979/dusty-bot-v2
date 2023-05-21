@@ -1,7 +1,7 @@
 """Extension object for discord bot"""
 import logging
 import traceback
-from logging import Formatter, LogRecord, handlers
+from logging import Formatter, LogRecord
 
 from aiohttp import ClientSession
 from discord import Activity, ActivityType, Guild, HTTPException, Intents, InvalidData, NotFound, TextChannel
@@ -70,12 +70,6 @@ class DustyBot(Bot):
         if not self.token:
             raise MissingBotTokenException()
 
-        handler = handlers.RotatingFileHandler(
-            filename=self.config['DISCORD_LOG_FILE_PATH'],
-            encoding='utf-8',
-            maxBytes=32 * 1024 * 1024,  # 32 MiB
-            backupCount=5,  # Rotate through 5 files
-        )
         formatter = Formatter(
             fmt='%(name)s [%(asctime)s] [%(levelname)s] %(message)s',
             datefmt='%x %X %z'
@@ -83,7 +77,6 @@ class DustyBot(Bot):
         super().run(
             token=self.token,
             reconnect=True,
-            log_handler=handler,
             log_formatter=formatter,
             log_level=self.config['LEVEL']
         )
