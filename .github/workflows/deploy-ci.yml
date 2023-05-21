@@ -8,17 +8,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Setup
-      id: setup
-      uses: superfly/flyctl-actions/setup-flyctl@master
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
       with:
-        fetch-depth: 0
+        fetch-depth: 0  
+    - id: get_tag
       run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+    - uses: superfly/flyctl-actions/setup-flyctl@master
     - name: Deploy
       env:
         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        RELEASE_VERSION: ${{ steps.setup.outputs.tag }}
+        RELEASE_VERSION: ${{ steps.get_tag.outputs.tag }}
       run: |
         echo "Deploying ${{ github.workspace }} $RELEASE_VERSION to Fly"
         flyctl deploy --remote-only
