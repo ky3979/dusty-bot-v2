@@ -26,7 +26,7 @@ protected_branches='develop-main' # concatonated names of branches to protect us
 current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
 result=0
 
-if [ "$protected_branches" == *"$current_branch"* ];
+if [[ "$protected_branches" == *"$current_branch"* ]];
 then
     read -p "You're about to push to ${current_branch}, is that what you intended? [y|n] " -n 1 -r < /dev/tty
     echo
