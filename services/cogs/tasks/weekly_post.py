@@ -28,10 +28,17 @@ class WeeklyPostCog(commands.Cog):
     async def send_posts(self):
         """Send posts from database on their scheduled day and time"""
         _log.info(f'[send_post] Executing send_posts task.')
-    
         now = datetime.now()
-        posts_for_today = WeeklyPost.get_by_day_of_week(now.weekday())
+
+        try:
+            posts_for_today = WeeklyPost.get_by_day_of_week(now.weekday())
+        except:
+            _log.error('There was an error getting the weekly posts.')
+            traceback.print_stack()
+            posts_for_today = []
+    
         _log.info(f'[send_post] Got {len(posts_for_today)} posts for {now}.')
+        _log.info(f'[send_post] Sending posts with hour {now.hour} and minute {now.minute}.')
         
         for post in posts_for_today:
             _log.info(f'[send_post] Got post {post.id} with hour {post.hour} and minute {post.minute}.')
@@ -46,10 +53,14 @@ class WeeklyPostCog(commands.Cog):
         _log.info(f'[send_post] Before send_posts task.')
         await self.bot.wait_until_ready()
 
+        now = datetime.now()
+        if now.minute in [0, 30]:
+            # Task is synced to half hour starting at 0
+            return
+
         self.syncing_time = True
         while self.syncing_time:
             # Wait until next half hour
-            now = datetime.now()
             next_half_hour = ceil_datetime(now, timedelta(minutes=30))
             delay = seconds_until(next_half_hour.hour, next_half_hour.minute)
 

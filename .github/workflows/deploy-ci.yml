@@ -16,7 +16,7 @@ jobs:
     - name: Install flyctl cli
       uses: superfly/flyctl-actions/setup-flyctl@master
 
-    - name: Deploy ${GITHUB_REF#refs/*/} to Fly
+    - name: Deploy ${{ GITHUB_REF#refs/*/ }} to Fly
       env:
         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
       run: |
