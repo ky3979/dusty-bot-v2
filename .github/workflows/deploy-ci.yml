@@ -16,8 +16,13 @@ jobs:
     - name: Install flyctl cli
       uses: superfly/flyctl-actions/setup-flyctl@master
 
-    - name: Deploy ${GITHUB_REF#refs/*/} to Fly
-      env:
+    - name: Set release version
+      id: release
+      run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      
+    - env:
         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        RELEASE_VERSION: ${{ steps.release.outputs.tag }}
+      name: Deploy ${{ env.RELEASE_VERSION }} to Fly
       run: |
         flyctl deploy --remote-only
