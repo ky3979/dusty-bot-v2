@@ -1,9 +1,4 @@
-PACKAGE := services
-
-# For passing arguments into 'make migrate'
-args = $(foreach a,$($(subst -,_,$1)_args),$(if $(value $a),$a="$($a)"))
-
-message_args = msg
+PACKAGE := src
 
 # MAIN TASKS ##################################################################
 
@@ -12,7 +7,7 @@ all: install
 
 .PHONY: run ## Start the program
 run: install
-	@ DEBUG=true PORT=8000 poetry run honcho start server bot
+	poetry run python main.py
 
 .PHONY: hooks
 hooks: .git/hooks/pre-push
@@ -69,20 +64,23 @@ format: install
 lint: pylint
 
 # DATABASE ####################################################################
-args = $(foreach a,$($(subst -,_,$1)_args),$(if $(value $a),--$a "$($a)"))
+ARGS = $(foreach a,$($(subst -,_,$1)_args),$(if $(value $a),-$a "$($a)"))
 
-migrate_args = message
-upgrade_args = none
-downgrade = none
+ALEMBIC_PATH := ./migrations/alembic.ini
+migrate_args = m
 
-DB_TASKS = \
-	migrate \
-	upgrade \
-	downgrade
+.PHONY: migrate
+migrate: .install
+	poetry run alembic -c $(ALEMBIC_PATH) revision --autogenerate $(call ARGS,$@)
 
-.PHONY: $(DB_TASKS)
-$(DB_TASKS): .install
-	FLASK_APP="services:create_app()" poetry run flask db $@ $(call args,$@)
+.PHONY: upgrade
+upgrade: .install
+	poetry run alembic -c $(ALEMBIC_PATH) upgrade head
+
+.PHONY: downgrade
+downgrade: .install
+	poetry run alembic -c $(ALEMBIC_PATH) downgrade -1
+
 
 .install: poetry.lock
 	poetry install

@@ -4,21 +4,17 @@ version = "0.1.0"
 description = ""
 authors = ["Ky Nguyen <ngky517@gmail.com>"]
 packages = [
-    { include = "services" }
+    { include = "src" }
 ]
 
 [tool.poetry.dependencies]
 python = "^3.10.5"
 gunicorn = "^20.1"
-flasgger = "=0.9.4dev0"
 requests = "^2.22"
 "discord.py" = "^2.2.3"
-psycopg2-binary = "^2.9.3"
+alembic = "^1.11.1"
 asyncpg = "^0.27.0"
-aiohttp = "^3.8.1"
-Flask = "^2.3.2"
-Flask-SQLAlchemy = "^3.0.3"
-Flask-Migrate = "^4.0.4"
+sqlmodel = "^0.0.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"
@@ -26,7 +22,6 @@ pytest-random-order = "^1.0.4"
 pylint = "~2.13.9"
 pytest-cov = "^3.0"
 responses = "^0.10.8"
-honcho = "^1.1.0"
 factory-boy = "^3.2.1"
 "testing.postgresql" = "^1.3.0"
 python-dotenv = "^1.0.0"

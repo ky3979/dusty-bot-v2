@@ -9,10 +9,8 @@ primary_region = "ord"
 kill_signal = "SIGINT"
 kill_timeout = 5
 
-
 [deploy]
     release_command = "./release.sh"
 
 [processes]
-    server = "./server.sh"
     bot = "python main.py"

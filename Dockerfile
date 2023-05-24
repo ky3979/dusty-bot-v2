@@ -1,7 +1,6 @@
 FROM python:3.10.5
 
 # Create container directory
-RUN mkdir /app
 WORKDIR /app
 ENV PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \

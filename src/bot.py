@@ -1,69 +1,43 @@
-"""Extension object for discord bot"""
+"""Discord bot"""
 import logging
 import traceback
-from logging import Formatter, LogRecord
+from logging import Formatter
 
-from aiohttp import ClientSession
 from discord import Activity, ActivityType, Guild, HTTPException, Intents, InvalidData, NotFound, TextChannel
 from discord.ext.commands import Bot, ExtensionFailed, ExtensionNotFound, NoEntryPointError
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 
-from services.exceptions.bot import MissingBotTokenException
-from services.exceptions.cog import LoadCogException
+from src.config import Config
+from src.exceptions.bot import MissingBotTokenException
+from src.exceptions.cog import LoadCogException
 
-
-class CustomFormatter(Formatter):
-    def format(self, record: LogRecord) -> str:
-        s = super().format(record)
-        return s
-
-PREFIX = '!'
-DESCRIPTION = 'Official Dusty Server Bot'
-
-_log = logging.getLogger('DustyBot')
 
 class DustyBot(Bot):
     """
     Dusty Bot object
     """
 
-    def __init__(self, app: Flask = None, db: SQLAlchemy = None, cogs: list[str] = None):
+    def __init__(self, config: Config):
         super().__init__(
-            command_prefix=PREFIX,
-            description=DESCRIPTION,
+            command_prefix=config.DISCORD_COMMAND_PREFIX,
+            description=config.DISCORD_BOT_DESCRIPTION,
             intents=Intents.all()
         )
 
-        self._cogs: list[str] = []
-        self.app: Flask = app
-        self.token: str = None
+        self.config = config
+        self.token: str = config.DISCORD_BOT_TOKEN
         self.ready: bool = False
-        self.db: SQLAlchemy = None
         self.my_guild: Guild = None
         self.main_channel: TextChannel = None
-        self.session: ClientSession = None
-        self.config = None
+        self.db = None
+        self._cogs: list[str] = []
+        self._log = logging.getLogger('DustyBot')
 
-        if app is not None:
-            self.init_app(app, db, cogs)
-
-    def init_app(self, app: Flask, db: SQLAlchemy, cogs: list[str]):
-        if 'dusty-bot' in app.extensions:
-            raise RuntimeError(
-                'A \'Dusty Bot\' instance has already been registered on this Flask app.'
-                'Import and use that instance instead.'
-            )
-        app.extensions['dusty-bot'] = self
-
-        self.app = app
-        self.db = db
-        self._cogs = cogs
-        self.config = app.config
-
-        self.token = app.config['DISCORD_BOT_TOKEN']
         if not self.token:
             raise MissingBotTokenException()
+
+    def set_cogs(self, cogs: list[str]):
+        """Set the bot cogs to load when it runs"""
+        self._cogs = cogs
 
     def run(self):
         """Run the bot"""
@@ -78,7 +52,7 @@ class DustyBot(Bot):
             token=self.token,
             reconnect=True,
             log_formatter=formatter,
-            log_level=self.config['LEVEL']
+            log_level=self.config.LEVEL
         )
 
     async def load_cogs(self):
@@ -90,7 +64,6 @@ class DustyBot(Bot):
                 raise LoadCogException(ext) from e
 
     async def on_ready(self):
-        await self.tree.sync()
         if not self.ready:
             self.ready = True
             await self.change_presence(
@@ -99,7 +72,7 @@ class DustyBot(Bot):
                     name='You Sleep.'
                 )
             )
-            _log.info(
+            self._log.info(
                 '\n========================================================\n'
                 '\n\tDUSTY BOT IS READY !\n'
                 '\tLOGGED IN AS %s !\n'
@@ -108,36 +81,33 @@ class DustyBot(Bot):
             )
 
     async def setup_hook(self):
-        if self.session is None:
-            self.session = ClientSession()
-
         try:
-            guild_id = self.config['DISCORD_GUILD_ID']
+            guild_id = self.config.DISCORD_GUILD_ID
             self.my_guild = await self.fetch_guild(int(guild_id))
-        except HTTPException:
-            _log.error('Error fetching guild with ID %s.', guild_id)
-            traceback.print_stack()
+        except HTTPException as e:
+            self._log.error('Error fetching guild with ID %s.', guild_id)
+            traceback.print_exception(e)
 
         try:
-            channel_id = self.config['DISCORD_MAIN_CHANNEL_ID']
+            channel_id = self.config.DISCORD_MAIN_CHANNEL_ID
             self.main_channel = await self.fetch_channel(int(channel_id))
-        except (HTTPException, InvalidData, NotFound):
-            _log.error('Error fetching channel with ID %s.', channel_id)
-            traceback.print_stack()
+        except (HTTPException, InvalidData, NotFound) as e:
+            self._log.error('Error fetching channel with ID %s.', channel_id)
+            traceback.print_exception(e)
 
         try:
-            self.owner_id = int(self.config['DISCORD_OWNER_ID'])
+            self.owner_id = int(self.config.DISCORD_OWNER_ID)
         except ValueError:
             app_info = await self.application_info()
             self.owner_id = app_info.owner.id
 
         await self.load_cogs()
+        await self.tree.sync()
 
     async def close(self):
-        if self.session is not None:
-            await self.session.close()
+        await self.db.engine.dispose()
         await super().close()
-        _log.info(
+        self._log.info(
             '\n========================================================\n'
             '\n\tDUSTY BOT IS OFFLINE !\n'
             '\nLOGGED OUT AS %s !\n'

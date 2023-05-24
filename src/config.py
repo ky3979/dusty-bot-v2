@@ -19,10 +19,10 @@ class Config:
     DEBUG: bool = False
     LEVEL: int = logging.INFO
 
-    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SQLALCHEMY_DATABASE_URI: str = 'sqlite:///'
-    SQLALCHEMY_LOG_LEVEL: int = logging.INFO
 
+    DISCORD_COMMAND_PREFIX: str = '!'
+    DISCORD_BOT_DESCRIPTION: str = 'Official Dusty Server Bot'
     DISCORD_BOT_TOKEN: str = os.getenv('DISCORD_BOT_TOKEN', '')
     DISCORD_GUILD_ID: str = os.getenv('DISCORD_GUILD_ID', '')
     DISCORD_OWNER_ID: str = os.getenv('DISCORD_OWNER_ID', '')
@@ -43,7 +43,7 @@ class LocalConfig(Config):
     DB_USER: str = 'dusty'
     DB_PASSWORD: str = 'dusty'
     DB_SCHEMA: str = 'dusty'
-    SQLALCHEMY_DATABASE_URI: str = f'postgresql://{DB_USER}:{DB_PASSWORD}@localhost:5432/{DB_SCHEMA}'
+    SQLALCHEMY_DATABASE_URI: str = f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@localhost:5432/{DB_SCHEMA}'
 
 def get_config(name=os.getenv('CONFIG', 'local')):
     """Retrieve a config"""
