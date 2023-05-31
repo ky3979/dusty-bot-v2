@@ -1,6 +1,7 @@
 """SQLAlchemy extension"""
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.pool import NullPool
 from sqlmodel import SQLModel
 
 from src.bot import DustyBot
@@ -22,7 +23,12 @@ class SQLAlchemy:
     def init_bot(self, bot: DustyBot):
         """Initialize the connection engine using the bot config"""
         bot.db = self
-        self.engine = create_async_engine(url=bot.config.SQLALCHEMY_DATABASE_URI, echo=True)
+        self.engine = create_async_engine(
+            url=bot.config.SQLALCHEMY_DATABASE_URI,
+            future=True,
+            echo=False,
+            poolclass=NullPool
+        )
         self._session = self._make_scoped_session(self.engine)
 
     async def get_session(self) -> AsyncSession:
