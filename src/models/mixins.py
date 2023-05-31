@@ -6,7 +6,6 @@ from typing import Optional, Type, TypeVar
 
 from pydantic import BaseModel
 from sqlalchemy import Column, DateTime, func
-from sqlalchemy.future import select
 from sqlmodel import Field
 
 from src.extensions import db
@@ -32,7 +31,7 @@ class TimeStampMixin(BaseModel):
         )
     )
 
-_T = TypeVar("_T")
+_T = TypeVar('_T')
 
 class CRUDMixin(BaseModel):
     """
@@ -65,8 +64,7 @@ class CRUDMixin(BaseModel):
         session = await db.get_session()
         session.delete(self)
         return commit and await session.commit()
-
-
+        
 T = TypeVar('T', bound='DustyModel')
 
 class DustyModel(db.Model, CRUDMixin, TimeStampMixin):
@@ -79,9 +77,8 @@ class DustyModel(db.Model, CRUDMixin, TimeStampMixin):
     id: Optional[int] = Field(default=None, primary_key=True)
 
     @classmethod
-    async def get(cls: Type[T], _id: int) -> T:
+    async def get(cls: Type[T], id: int) -> T:
         """Return object by id"""
         session = await db.get_session()
-        stmt = select(cls).filter_by(id=_id)
-        result = await session.execute(stmt)
-        return result.one()
+        model = await session.get(cls, id)
+        return model

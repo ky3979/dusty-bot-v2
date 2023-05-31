@@ -40,11 +40,11 @@ class WeeklyPostCog(commands.Cog):
         self._log.info('[send_post] Sending posts with hour %d and minute %d.', now.hour, now.minute)
 
         for post in posts_for_today:
-            self._log.info('[send_post] Got post %d with hour %d and minute %d.', post.id, post.hour, post.minute)
+            self._log.info('[send_post] Got post ID %d with hour %d and minute %d.', post.id, post.hour, post.minute)
             if post.hour == now.hour and post.minute == now.minute:
-                self._log.info('[send_post] Sending post %d.', post.id)
+                self._log.info('[send_post] Sending post ID %d.', post.id)
                 await self.bot.main_channel.send(post.content)
-                self._log.info('[send_post] Post %d successfully sent.', post.id)
+                self._log.info('[send_post] Post ID %d successfully sent.', post.id)
 
     @send_posts.before_loop
     async def before_send_posts(self):

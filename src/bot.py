@@ -52,7 +52,7 @@ class DustyBot(Bot):
             token=self.token,
             reconnect=True,
             log_formatter=formatter,
-            log_level=self.config.LEVEL
+            log_level=logging.INFO
         )
 
     async def load_cogs(self):
