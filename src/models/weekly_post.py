@@ -1,4 +1,4 @@
-"""Scheduled post model"""
+"""Weekly post model"""
 from typing import Type, TypeVar
 
 from sqlalchemy.future import select
@@ -25,4 +25,4 @@ class WeeklyPost(DustyModel, table=True):
         session = await db.get_session()
         stmt = select(cls).filter_by(day_of_week=day_of_week)
         result = await session.execute(stmt)
-        return result.all()
+        return result.scalars().all()
