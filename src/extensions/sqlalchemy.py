@@ -1,7 +1,6 @@
 """SQLAlchemy extension"""
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.pool import NullPool
 from sqlmodel import SQLModel
 
 from src.bot import DustyBot
@@ -27,7 +26,7 @@ class SQLAlchemy:
             url=bot.config.SQLALCHEMY_DATABASE_URI,
             future=True,
             echo=False,
-            poolclass=NullPool
+            pool_recycle=1800
         )
         self._session = self._make_scoped_session(self.engine)
 
