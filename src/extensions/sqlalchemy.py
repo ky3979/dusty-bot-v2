@@ -1,6 +1,6 @@
 """SQLAlchemy extension"""
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 
 from src.bot import DustyBot
@@ -14,7 +14,6 @@ class SQLAlchemy:
     def __init__(self, bot: DustyBot = None):
         self.Model = SQLModel
         self.engine: AsyncEngine = None
-        self._session: AsyncSession = None
 
         if bot is not None:
             self.init_bot(bot)
@@ -28,18 +27,9 @@ class SQLAlchemy:
             echo=False,
             pool_recycle=1800
         )
-        self._session = self._make_scoped_session(self.engine)
 
     async def get_session(self) -> AsyncSession:
         """Get session instance"""
-        async with self._session() as session:
+        async_session = sessionmaker(class_=AsyncSession, bind=self.engine, expire_on_commit=False)
+        async with async_session() as session:
             return session
-
-    def _make_scoped_session(self, engine: AsyncEngine) -> scoped_session:
-        """Create and return a Async Session scoped session"""
-        factory = self._make_session_factory(engine)
-        return scoped_session(factory)
-
-    def _make_session_factory(self, engine: AsyncEngine) -> sessionmaker:
-        """Create and return a Async session maker"""
-        return sessionmaker(class_=AsyncSession, bind=engine, expire_on_commit=False)
