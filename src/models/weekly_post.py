@@ -21,8 +21,8 @@ class WeeklyPost(DustyModel, table=True):
     minute: int = Field(default=0)
 
     @classmethod
-    async def get_by_day_of_week(cls: Type[T], day_of_week: int) -> list[T]:
-        session = await db.get_session()
-        stmt = select(cls).filter_by(day_of_week=day_of_week)
-        result = await session.execute(stmt)
-        return result.scalars().all()
+    async def get(cls: Type[T], **kwargs) -> list[T]:
+        async with db.session() as session:
+            stmt = select(cls).filter_by(**kwargs)
+            result = await session.execute(stmt)
+            return result.scalars().all()

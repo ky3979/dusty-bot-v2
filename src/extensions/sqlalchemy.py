@@ -14,6 +14,7 @@ class SQLAlchemy:
     def __init__(self, bot: DustyBot = None):
         self.Model = SQLModel
         self.engine: AsyncEngine = None
+        self.session: sessionmaker[AsyncSession] = None
 
         if bot is not None:
             self.init_bot(bot)
@@ -25,11 +26,10 @@ class SQLAlchemy:
             url=bot.config.SQLALCHEMY_DATABASE_URI,
             future=True,
             echo=False,
-            pool_recycle=1800
+            pool_pre_ping=True,
+            pool_use_lifo=True,
+            pool_recycle=1800,
+            pool_size=10,
+            max_overflow=20,
         )
-
-    async def get_session(self) -> AsyncSession:
-        """Get session instance"""
-        async_session = sessionmaker(class_=AsyncSession, bind=self.engine, expire_on_commit=False)
-        async with async_session() as session:
-            return session
+        self.session = sessionmaker(class_=AsyncSession, bind=self.engine, expire_on_commit=False)

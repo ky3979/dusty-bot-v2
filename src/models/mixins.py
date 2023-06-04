@@ -39,7 +39,7 @@ class CRUDMixin(BaseModel):
     """
 
     @classmethod
-    async def create(cls: Type[_T], commit: bool=True,**kwargs) -> _T:
+    async def create(cls: Type[_T], commit: bool=True, **kwargs) -> _T:
         """Create model"""
         instance = cls(**kwargs)
         return await instance.save(commit=commit)
@@ -53,17 +53,17 @@ class CRUDMixin(BaseModel):
 
     async def save(self, commit: bool=True):
         """Save model"""
-        session = await db.get_session()
-        session.add(self)
-        if commit:
-            await session.commit()
-        return self
+        async with db.session() as session:
+            session.add(self)
+            if commit:
+                await session.commit()
+            return self
 
     async def delete(self, commit: bool=True):
         """Delete model"""
-        session = await db.get_session()
-        session.delete(self)
-        return commit and await session.commit()
+        async with db.session() as session:
+            session.delete(self)
+            return commit and await session.commit()
         
 T = TypeVar('T', bound='DustyModel')
 
@@ -79,6 +79,6 @@ class DustyModel(db.Model, CRUDMixin, TimeStampMixin):
     @classmethod
     async def get(cls: Type[T], id: int) -> T:
         """Return object by id"""
-        session = await db.get_session()
-        model = await session.get(cls, id)
-        return model
+        async with db.session() as session:
+            model = await session.get(cls, id)
+            return model

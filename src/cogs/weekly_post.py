@@ -31,16 +31,19 @@ class WeeklyPostCog(commands.Cog):
         now = datetime.now()
 
         try:
-            posts_for_today = await WeeklyPost.get_by_day_of_week(now.weekday())
+            posts_for_today = await WeeklyPost.get(
+                day_of_week=now.weekday(),
+                hour=now.hour,
+                minute=now.minute
+            )
         except DatabaseException:
             self._log.error('There was an error getting the weekly posts.')
             posts_for_today = []
 
-        self._log.info('[send_post] Got %d posts for weekday %d.', len(posts_for_today), now.weekday())
-        self._log.info('[send_post] Sending posts with hour %d and minute %d.', now.hour, now.minute)
+        self._log.info('[send_post] Got %d posts for weekday %d, hour %d, and minute %d.',
+                       len(posts_for_today), now.weekday(), now.hour, now.minute)
 
         for post in posts_for_today:
-            self._log.info('[send_post] Got post ID %d with hour %d and minute %d.', post.id, post.hour, post.minute)
             if post.hour == now.hour and post.minute == now.minute:
                 self._log.info('[send_post] Sending post ID %d.', post.id)
                 await self.bot.main_channel.send(post.content)
